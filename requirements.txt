@@ -1,0 +1,9 @@
+seaborn
+matplotlib
+sklearn
+numpy
+pandas
+umap-learn
+trimap
+altair
+jupyter

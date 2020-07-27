@@ -1,0 +1,8 @@
+target
+.ipynb_checkpoints
+notebooks/jupyter/.ipynb_checkpoints
+data/local
+notebooks/oz/local/
+notebooks/jupyter/local
+notebooks/build/local
+clojupyter-standalone.jar
