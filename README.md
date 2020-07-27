@@ -1,7 +1,93 @@
 
-## Setup
+# Polis Analysis
 
-First install Docker, however you'd like to do that for your system.
+This (WIP) repository contains code for analyzing Polis conversation data.
+
+Specifically, it contains:
+
+* An API of Clojure functions for processing data (see `src/polis/math.clj`)
+  * [libpython-clj](https://github.com/clj-python/libpython-clj) bindings for running python tools like UMAP, Trimap & Leiden
+* A set of Jupyter notebooks, with both Clojure & Python kernels, in `notebooks/jupyter`
+* A set of Oz notebooks in `notebooks/oz`
+* A `Dockerfile` which should assist in making all of the above run reproducibly
+
+
+## Prereqs
+
+If you'd like to use Docker to run this code, you'll obviously want to have Docker installed on your system, preferably set up so that you don't need to run with `sudo`.
+See the end of this document for instructions on this.
+
+You may also want to have `make` installed to simplify the process of running somewhat.
+If you don't have this installed yet, please try installing with your favorite package manager.
+
+
+## Usage
+
+### Building docker image
+
+Before you can run anything from Docker, you have to build the Docker image.
+First, clone the code, cd in, then run
+
+```
+make build
+```
+
+### Running docker image
+
+Once you've built the image (see above), you can run with
+
+```
+make run
+```
+
+### Connecting
+
+Once the docker container is running, you should see some lines printed like
+
+```
+    To access the notebook, open this file in a browser:
+        file:///root/.local/share/jupyter/runtime/nbserver-7-open.html
+    Or copy and paste one of these URLs:
+        http://b1640360dd7c:3870/?token=e9e17fcbba7adc211472eacce9319af016ad5b5a1cd6643a
+     or http://127.0.0.1:3870/?token=e9e17fcbba7adc211472eacce9319af016ad5b5a1cd6643a
+nREPL server started on port 3850 on host 0.0.0.0 - nrepl://0.0.0.0:3850
+```
+
+#### Jupyter
+
+To use the Jupyter notebooks, copy the `127.0.0.1` url and paste into your browser.
+You should now be able to create notebooks with either the Python or Clojupyter kernel, depending on what language you prefer to work with.
+
+
+#### Oz/Clojure
+
+If you're using Clojure, you can connect to the REPL using the port printed above.
+Most editors with good support for Clojure will be able to connect to this port automatically using the `.nrepl-port` file.
+If not, you should be able to manually establish a connection by specifying hostname and port.
+This will let you evaluate and interact with code directly from your editor.
+If you'd rather, you can install `leiningen` and start a repl with `lein repl :connect localhost:3850`, and interact with Clojure through a traditional REPL process.
+
+Once you have this running you can look at `dev/user.clj`, which has a commented out line for running `(oz/build! ...)`.
+If you execute this, it will build the Clojure/[Oz](https://github.com/metasoarous/oz) notebooks in `notebooks/oz`, and compile html output to `notebooks/build`.
+This build process features live code reloading, so that as you save changes to the notebook file, a live view of the results can be accessed at http://localhost:3860.
+
+
+### Stopping
+
+When you're ready to stop the process, open up another terminal shell and run
+
+```
+docker ps
+```
+
+Copy the `CONTAINER ID` of the `polis-analysis-docker` image, and run
+
+```
+docker kill <CONTAINER-ID>
+```
+
+
+## Installing Docker
 
 For Ubuntu-like Linux,
 ```
@@ -10,32 +96,11 @@ sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-See https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04
+A more complete guide can be found here: https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04
 
-If you don't want to have to run Docker with sudo, see:
+If you don't want to have to run Docker with sudo, see: https://docs.docker.com/engine/install/linux-postinstall
 
-```
-https://docs.docker.com/engine/install/linux-postinstall/
-```
-
-The rest of these instructions assume this has been run.
-
-## Building docker image
-
-Clone the code, cd in, then
-
-```
-make build
-```
-
-## Running docker image
-
-Once you've built the image (see above), you can run
-
-```
-make run
-```
-
-
+The rest of these instructions assume that this has been performed, and that you don't need sudo access to
+run.
 
 
