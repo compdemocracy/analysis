@@ -40,19 +40,23 @@ build:
 	docker build . -f Dockerfile -t polis-analysis-docker
 
 
-.PHONY: clean
-clean:
-ifeq ($(strip $(shell docker ps -aq)),)
-	echo "No running processes"
-else
-	docker rm -fv $(shell docker ps -aq)
-endif
+.PHONY: kill
+kill:
+	docker kill $(shell docker ps --filter ancestor=polis-analysis-docker | tail -n -1 | cut -f 1 -d " ")
+
+#.PHONY: clean
+#clean:
+#ifeq ($(strip $(shell docker ps -aq)),)
+	#echo "No running processes"
+#else
+	#docker rm -fv $(shell docker ps -aq)
+#endif
 
 nrepl_port ?=3850
 oz_port ?=3860
 jupyter_port ?=3870
 
 .PHONY: run
-run: clean
+run:
 	docker run -p $(nrepl_port):3850 -p $(oz_port):3860 -p $(jupyter_port):3870 -v ${PWD}:/app -e CHOKIDAR_USEPOLLING=true polis-analysis-docker
 
