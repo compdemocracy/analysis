@@ -33,7 +33,7 @@ RUN clojure -Sdeps '{:deps {org.clojure/clojure {:mvn/version "1.10.0"} \
         org.clojure/tools.deps.alpha {:mvn/version "0.6.496" \
                                       :exclusions [org.slf4j/slf4j-nop]} \
         cider/cider-nrepl {:mvn/version "0.21.1"} \
-        metasoarous/oz {:mvn/version "1.6.0-alpha11"} \
+        metasoarous/oz {:mvn/version "1.6.0-alpha14"} \
         clojupyter {:mvn/version "0.3.2"}}}' \
    -e "(clojure.core/println :deps-downloaded)"
 
