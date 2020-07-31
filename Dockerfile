@@ -62,6 +62,16 @@ RUN npm install -g --unsafe-perm vega vega-lite vega-cli
 # Pandoc for fun and profit
 RUN apt-get -y install pandoc
 
+# Sketch for improved permissions
+#ARG UID=1000
+#ARG GID=133
+#ARG USERNAME=analyst
+
+#RUN groupadd -g $GID $USERNAME
+#RUN useradd -u $UID -g $GID $USERNAME
+#RUN mkdir /home/$USERNAME && chown $USERNAME:$USERNAME /home/$USERNAME
+#USER $USERNAME
+# Means using a different directory though
 
 # Everything after this will get rerun even if the commands haven't changed, since data could change
 WORKDIR /app
