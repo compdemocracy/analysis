@@ -13,16 +13,6 @@
                 '[pandas :as pandas]
                 '[umap :as umap])
 
-(oz/start-server! 3860)
-
-(oz/build! [{:from "notebooks/oz"
-             :to "notebooks/build"}
-            {:from "local/notebooks"
-             :to "local/build"}]
-           :port 3860)
-
-(println "Clojure environment loaded.")
-(println "Now servering Oz notebooks at: " (str "http://localhost:" 3860))
 
 (comment
   ;; You can also 
@@ -30,6 +20,11 @@
              :mark :point
              :encoding {:x {:field :a}
                         :y {:field :b}}})
+  (oz/build! [{:from "notebooks/oz"
+               :to "notebooks/build"}
+              {:from "local/notebooks"
+               :to "local/build"}]
+             :port 3860)
   :end)
 
 
