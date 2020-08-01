@@ -40,6 +40,14 @@ Once you've built the image (see above), you can run with
 make run
 ```
 
+### Building and running
+
+Of course, when you build, you'll typically want to run immediately thereafter, so you can also do
+
+```
+make build && make run
+```
+
 ### Connecting
 
 Once the docker container is running, you should see some lines printed like
@@ -74,22 +82,26 @@ This build process features live code reloading, so that as you save changes to 
 
 ### Stopping
 
+Docker containers can be a bit of a pain to stop.
 When you're ready to stop the process, open up another terminal shell and run
 
 ```
-docker ps
+make kill
 ```
 
-Copy the `CONTAINER ID` of the `polis-analysis-docker` image, and run
 
-```
-docker kill <CONTAINER-ID>
-```
+### Local Data & Notebooks
+
+There are a couple of example datasets in `data`, and some example notebooks in `notebooks`.
+If you have data or analysis you'd like to keep out of git, the `local` directory is in the `.gitignore`.
+
+In particular, Oz/Clojure are set up to build from `local/notebooks` to `local/build`, and you can put data in `local/data`.
 
 
 ## Installing Docker
 
 For Ubuntu-like Linux,
+
 ```
 sudo apt-get install docker.io
 sudo systemctl start docker
