@@ -1,8 +1,10 @@
 {:paths ["src"]
  :deps {org.clojure/clojure {:mvn/version "1.10.0"}
-        techascent/tech.ml.dataset {:mvn/version "3.01"
+        ;techascent/tech.ml.dataset {:mvn/version "4.00"}
+        techascent/tech.ml.dataset {:mvn/version "4.00"
                                     :exclusions [org.slf4j/slf4j-api]}
-
+        ;; For speeding up matrix operations with smile/tech.ml stack
+        ;com.github.haifengl/smile-mkl {:mvn/version "2.5.0"}
         semantic-csv {:mvn/version "0.2.1-alpha1"}
         ;techascent/tech.datatype {:mvn/version "5.05"}
         net.mikera/core.matrix {:mvn/version "0.62.0"}
@@ -10,7 +12,7 @@
         org.clojure/tools.deps.alpha {:mvn/version "0.6.496"
                                       :exclusions [org.slf4j/slf4j-nop]}
         cider/cider-nrepl {:mvn/version "0.21.1"}
-        metasoarous/oz {:mvn/version "1.6.0-alpha15"}
+        metasoarous/oz {:mvn/version "1.6.0-alpha24"}
         clojupyter {:mvn/version "0.3.2"}}
         ;panthera {:mvn/version "0.1-alpha.20"}}
  :aliases {:nREPL {:extra-deps {nrepl/nrepl {:mvn/version "0.6.0"}}}
