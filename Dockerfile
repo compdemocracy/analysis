@@ -25,7 +25,7 @@ RUN pip3 install seaborn &&\
     pip3 install jupyter
 
 RUN clojure -Sdeps '{:deps {org.clojure/clojure {:mvn/version "1.10.0"} \
-        techascent/tech.ml.dataset {:mvn/version "3.01" \
+        techascent/tech.ml.dataset {:mvn/version "4.00" \
                                     :exclusions [org.slf4j/slf4j-api]} \
         semantic-csv {:mvn/version "0.2.1-alpha1"} \
         net.mikera/core.matrix {:mvn/version "0.62.0"} \
