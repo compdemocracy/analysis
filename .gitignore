@@ -6,3 +6,4 @@ notebooks/oz/local/
 notebooks/jupyter/local
 notebooks/build/local
 clojupyter-standalone.jar
+local
