@@ -9,3 +9,5 @@ clojupyter-standalone.jar
 local
 __pycache__
 .calva
+.cpcache
+.nrepl-port
