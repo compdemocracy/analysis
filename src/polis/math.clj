@@ -109,25 +109,32 @@
         (update :summary merge derived-counts)
         (dissoc :voters-in-conv))))
 
+(defn filter-by-vals
+  [ds colname vals]
+  (let [filter-fn (comp (set vals) #(get % colname))]
+    (ds/filter filter-fn [colname] ds)))
 
-(defn mod-filter
-  [{:keys [summary comments votes participants matrix]} strict?]
-  (let [filter-fn (comp (if strict? (partial = 1) #{1 0})
-                        :moderated)
-        keep-comments (ds/filter filter-fn [:moderated] comments)
-        keep-comment-ids (set (:comment-id keep-comments))
-        keep-comment-colnames (set (map (comp keyword str) keep-comment-ids))
-        keep-votes (ds/filter (comp keep-comment-ids :comment-id)
-                              [:comment-id]
-                              votes)
+(defn filter-comments
+  [{:keys [summary comments votes participants matrix]} comment-ids]
+  (let [keep-comment-colnames (set (map (comp keyword str) comment-ids))
+        keep-comments (filter-by-vals comments :comment-id comment-ids)
+        keep-votes (filter-by-vals votes :comment-id comment-ids)
         drop-comment-colnames (set/difference (set (keys matrix)) keep-comment-colnames)
-        keep-matrix (ds/select-columns matrix keep-comment-colnames)]
+        keep-matrix (ds/unordered-select matrix keep-comment-colnames :all)]
     (update-summary
       {:summary summary
        :comments keep-comments
        :votes keep-votes
        :participants (ds/remove-columns participants drop-comment-colnames)
        :matrix keep-matrix})))
+
+(defn mod-filter
+  [{:as conv :keys [comments]} strict?]
+  (let [filter-fn (comp (if strict? (partial = 1) #{1 0})
+                        :moderated)
+        keep-comments (ds/filter filter-fn [:moderated] comments)
+        keep-comment-ids (set (:comment-id keep-comments))]
+    (filter-comments conv keep-comment-ids)))
 
 
 ;(defn vote-count-filter
@@ -228,14 +235,8 @@
 
 (defn subset-participants
   [{:as conv :keys [participants votes]} keep-pids]
-  (let [keep-pids (set keep-pids)
-        keep-participants
-        (->> participants
-             (ds/filter (comp keep-pids :participant)
-                        [:participant]))
-        keep-votes (ds/filter (comp keep-pids :voter-id)
-                              [:voter-id]
-                              votes)
+  (let [keep-participants (filter-by-vals participants :participant keep-pids)
+        keep-votes (filter-by-vals votes :voter-id keep-pids)
         keep-matrix (impute-means (select-votes keep-participants))]
     (update-summary
       (merge conv
@@ -251,4 +252,4 @@
                         [:group-id]))
         keep-pids (set (:participant keep-participants))]
     (subset-participants conv keep-pids)))
-  
+
