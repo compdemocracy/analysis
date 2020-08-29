@@ -19,6 +19,7 @@ RUN pip3 install seaborn &&\
     pip3 install matplotlib &&\
     pip3 install sklearn &&\
     pip3 install numpy &&\
+    pip3 install numba==0.50.1 &&\
     pip3 install umap-learn &&\
     pip3 install trimap &&\
     pip3 install altair &&\
