@@ -12,14 +12,16 @@
 
 ;; Require python libraries
 
-(require-python '[sklearn.datasets :as sk-data]
-                '[sklearn.model_selection :as sk-model]
-                '[sklearn.decomposition :as sk-decomp]
-                '[numpy :as numpy]
-                '[numba :as numba]
-                '[pandas :as pandas]
-                '[umap :as umap]
-                '[umap_metric :as umap_metric])
+(try
+  (require-python '[sklearn.datasets :as sk-data]
+                  '[sklearn.model_selection :as sk-model]
+                  '[sklearn.decomposition :as sk-decomp]
+                  '[numpy :as numpy]
+                  '[numba :as numba]
+                  '[pandas :as pandas]
+                  '[umap :as umap]
+                  '[umap_metric :as umap_metric])
+  (catch Throwable t))
 
 ;; Implement some basic column statistics
 
@@ -161,7 +163,7 @@
 (defn explained-variance
   [eigenvals]
   (let [sum (reduce + eigenvals)]
-    (vec (take 5 (map (fn [eig] (/ eig sum)) eigenvals)))))
+    (map (fn [eig] (/ eig sum)) eigenvals)))
 
 (defn apply-pca
   [{:as conv :keys [matrix]}

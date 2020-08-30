@@ -13,8 +13,8 @@
   ;; You can also 
   (oz/view! {:data {:values [{:a 1 :b 4} {:a 2 :b 2}]}
              :mark :point
-             :encoding {:x {:field :a}
-                        :y {:field :b}}}
+             :encoding {:x {:field :a :type :quantitative}
+                        :y {:field :b :type :quantitative}}}
             :port 3860)
 
   (oz/build! [{:from "notebooks/oz"

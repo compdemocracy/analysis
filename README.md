@@ -48,6 +48,24 @@ Of course, when you build, you'll typically want to run immediately thereafter, 
 make build && make run
 ```
 
+### Using `docker-compose`
+
+You can also use `docker-compose` instead of make:
+
+Generally, you'll want to run
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+Add the `dev.yml` file mounts your local checkout so that data, notebooks, and build targets can be mirrored
+to your local machine.
+This may not be desireable if you are running on a remote machine, or want to pre-build an image for
+distribution on (e.g.) docker-hub.
+If this sounds like you, you can simply run `docker-compose up`
+
+To rebuilt, add the `--build` flag.
+
 ### Connecting
 
 Once the docker container is running, you should see some lines printed like
@@ -78,6 +96,8 @@ If you'd rather, you can install `leiningen` and start a repl with `lein repl :c
 Once you have this running you can look at `dev/user.clj`, which has a commented out line for running `(oz/build! ...)`.
 If you execute this, it will build the Clojure/[Oz](https://github.com/metasoarous/oz) notebooks in `notebooks/oz`, and compile html output to `notebooks/build`.
 This build process features live code reloading, so that as you save changes to the notebook file, a live view of the results can be accessed at http://localhost:3860.
+
+**NOTE:** Due to a compilation bug with `libpython-clj`, you may have to evaluate the `polis.math` namespace before you can run the `user` namespace.
 
 
 ### Stopping
