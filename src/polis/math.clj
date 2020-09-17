@@ -433,3 +433,16 @@
      rv-coeff)))
 
 
+(defn window-select
+  "Filter a dataset based on a window map of colname->[min,max]"
+  [ds window]
+  (ds/filter
+    (fn [row]
+      (every?
+        (fn [[colname val-range]]
+          (let [[min-val max-val] (sort val-range)]
+            (<= min-val (get row colname) max-val)))
+        window))
+    (keys window)
+    ds))
+
