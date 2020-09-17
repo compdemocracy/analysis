@@ -137,6 +137,12 @@
   (let [filter-fn (comp (set vals) #(get % colname))]
     (ds/filter filter-fn [colname] ds)))
 
+
+(defn remove-by-vals
+  [ds colname vals]
+  (let [filter-fn (comp not (set vals) #(get % colname))]
+    (ds/filter filter-fn [colname] ds)))
+
 (defn filter-comments
   [{:keys [summary comments votes participants matrix]} comment-ids]
   (let [keep-comment-colnames (set (map (comp keyword str) comment-ids))
