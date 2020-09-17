@@ -10,6 +10,11 @@
             [semantic-csv.core :as csv]))
             ;[oz.core :as oz]))
 
+
+
+(def color-agree "#1b6244")
+
+
 (defn pc-vars
   [conv]
   (let [eigenvals (:eigenvalues (:pca conv))
