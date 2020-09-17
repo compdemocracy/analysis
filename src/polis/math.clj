@@ -244,6 +244,18 @@
         (update :participants ds/append-columns (ds/columns pca-proj))
         (update :comments ds/append-columns (ds/columns comment-pc-loadings)))))
 
+;; This umap is broken because missing vals don't make it through as nan as had been hoped
+;(defn apply-umap
+  ;[{:as conv :keys [participants]}
+   ;{:keys [dimensions] :or {dimensions 2}}]
+  ;(let [reducer (py/call-kw umap/UMAP [] {:n_components dimensions
+                                          ;:n_neighbors 10
+                                          ;:metric umap_metric/sparsity_aware_dist})
+        ;matrix (select-votes participants)
+        ;np-matrix (py/->numpy (dtensor/dataset->row-major-tensor matrix :float64))
+        ;embedding (np-array->dataset (py. reducer fit_transform np-matrix)
+                                     ;[:umap1 :umap2])]
+    ;(update conv :participants ds/append-columns (ds/columns embedding))))
 
 
 (defn apply-umap
@@ -251,8 +263,8 @@
    {:keys [dimensions] :or {dimensions 2}}]
   (let [reducer (py/call-kw umap/UMAP [] {:n_components dimensions
                                           :n_neighbors 10
-                                          :metric umap_metric/sparsity_aware_dist})
-        matrix (select-votes participants)
+                                          :metric umap_metric/sparsity_aware_dist2})
+        matrix (ds/replace-missing (select-votes participants) :all :value 0)
         np-matrix (py/->numpy (dtensor/dataset->row-major-tensor matrix :float64))
         embedding (np-array->dataset (py. reducer fit_transform np-matrix)
                                      [:umap1 :umap2])]
