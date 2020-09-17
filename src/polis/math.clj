@@ -2,13 +2,19 @@
   "Core Polis data analysis API, implemented with tech.ml.dataset and libpython-clj for python interop."
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.pca :as dpca]
-            [tech.v2.datatype :as dt]
+            [tech.ml.dataset.column :as dcol]
             [tech.ml.dataset.tensor :as dtensor]
+            [tech.v2.datatype :as dt]
+            [tech.v2.tensor :as tens]
+            [tech.v2.datatype.functional :as dfn]
             [libpython-clj.require :refer [require-python]]
             [libpython-clj.python :as py :refer [py. py.. py.-]]
             [semantic-csv.core :as csv]
+            [fastmath.stats :as fast-stats]
+            [taoensso.timbre :as log]
             [oz.core :as oz]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [kixi.stats.core :as kixi]))
 
 ;; Require python libraries
 
@@ -20,7 +26,7 @@
                   '[numba :as numba]
                   '[pandas :as pandas]
                   '[umap :as umap]
-                  '[umap_metric :as umap_metric])
+                  '[umap_metric :as umap_metric :reload])
   (catch Throwable t))
 
 ;; Implement some basic column statistics
@@ -56,7 +62,8 @@
 (defn impute-means
   "Returns a new dataset with imputed means"
   [dataset]
-  (let [stats (column-stats dataset)]
+  (let [stats (column-stats dataset)
+        colnames (vote-column-names dataset)]
     (-> dataset
         (ds/mapseq-reader)
         (->> (pmap
@@ -69,9 +76,23 @@
                             [k (or (:mean (get stats k)) 0)])))
                       (into {})))))
         (ds/->dataset)
-        (ds/select-columns
-          (sort-by (comp #(Integer/parseInt %) name) (vote-column-names dataset))))))
+        (ds/select-columns colnames))))
 
+
+(defn matrix-cast [ds to-type]
+  (reduce
+    (fn [ds' colname]
+      (ds/column-cast ds' colname to-type))
+    ds
+    (ds/column-names ds)))
+
+;; This doesn't quite work because it places the computed means in as ints (need to have col types updated for
+;; this to work); However, annecotally, may be 10x performance boost (3 sec to 300ms for one dataset)
+(defn impute-means2
+  [ds]
+  (-> (matrix-cast ds :float64)
+      (ds/replace-missing
+        :all :value (fn [col] (/ (reduce + col) (float (count col)))))))
 
 (defn- file-dataset
   [export-dir filename]
