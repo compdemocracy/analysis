@@ -99,6 +99,8 @@
    :commenters "Commenters"
    :comments "Comments"
    :votes "Votes"
+   :agrees "Agrees"
+   :disagrees "Disagrees"
    :votes-per-participant "Votes / participant (avg)"})
 
 (defn summary-table
