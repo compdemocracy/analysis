@@ -121,8 +121,19 @@
                    (float? val) (round 2))]
          [td val]))]])
   ([conv]
-   (summary-table conv [:voters :groups :commenters :comments :votes :votes-per-participant])))
+   (summary-table conv [:voters :groups :commenters :comments :votes :agrees :disagrees :votes-per-participant])))
 
+(defn summary-list
+  ([{:keys [summary]} keys]
+   [:ul
+     (for [k keys]
+       (let [val (get summary k)
+             val (cond-> val
+                   (float? val) (round 2))]
+         [:li [:strong (labels-map k)] ": "
+              val]))])
+  ([conv]
+   (summary-list conv [:voters :groups :commenters :comments :votes :agrees :disagrees :votes-per-participant])))
 
 (defn variance-report
   [conv]
