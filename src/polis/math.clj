@@ -223,13 +223,22 @@
   (let [np-matrix (py/->numpy (dtensor/dataset->row-major-tensor matrix :float64))
         sk-pca (py. (sk-decomp/PCA dimensions) fit np-matrix)
         pca-proj (np-array->dataset (py. sk-pca fit_transform np-matrix)
-                                    [:pc1 :pc2])]
+                                    [:pc1 :pc2])
+        eigenvectors (py.- sk-pca components_)
+        comment-pc-loadings (ds/rename-columns
+                              (dtensor/column-major-tensor->dataset
+                                (py/->jvm eigenvectors))
+                              {0 :pc1
+                               1 :pc2})]
     (-> conv
         (assoc :pca 
                {:projection pca-proj
-                :eigenvectors (py.- sk-pca components_)
+                :eigenvectors eigenvectors
                 :explained-variance (py.- sk-pca explained_variance_ratio_)})
-        (update :participants ds/append-columns (ds/columns pca-proj)))))
+        (update :participants ds/append-columns (ds/columns pca-proj))
+        (update :comments ds/append-columns (ds/columns comment-pc-loadings)))))
+
+
 
 (defn apply-umap
   [{:as conv :keys [participants]}
