@@ -303,3 +303,133 @@
         keep-pids (set (:participant keep-participants))]
     (subset-participants conv keep-pids)))
 
+
+(defn centered-matrix
+  [ds]
+  (-> ds
+      ;; here, we're imputing means for missing values, and then subtracting means; inefficient recomputation
+      ;; of the means; could in theory be doing something smarter
+      (impute-means2)
+      (ds/columns)
+      (->> (map (fn [col] (dfn/- col (:mean (dcol/stats col [:mean]))))))
+      ;; converting into a dataset just to convert to tensor seems silly and innefficient, but writing this
+      ;; way for convenience (and out of ignorance of the finer workings of tech.v2.datatype
+      (ds/new-dataset)
+      (dtensor/dataset->row-major-tensor :float64)))
+
+
+(defn mget
+  [m i j]
+  (-> m
+      (dt/get-value i)
+      (dt/get-value j)))
+
+(defn trace
+  [m]
+  (let [shape (:shape (tens/tensor->dimensions m))
+        n (apply min shape)]
+    (->> (range n)
+         (map (fn [i] (mget m i i)))
+         (reduce +))))
+
+;; this implementation will generally be much less efficient, given number of participants
+;(defn rv-coefficient
+  ;[ds1 ds2]
+  ;(when (or (> (ds/row-count ds1) 1)
+            ;(> (ds/row-count ds2) 1))
+    ;(let [x (centered-matrix ds1)
+          ;y (centered-matrix ds2)
+          ;x' (tens/transpose x [1 0])
+          ;y' (tens/transpose y [1 0])
+          ;xx' (tens/matrix-multiply x x')
+          ;yy' (tens/matrix-multiply y y')]
+      ;(/ (trace (tens/matrix-multiply xx' yy'))
+         ;(Math/sqrt
+           ;(* (trace (tens/matrix-multiply xx' xx'))
+              ;(trace (tens/matrix-multiply yy' yy'))))))))
+
+(defn rv-coefficient
+  [ds1 ds2]
+  (when (and (> (ds/column-count ds1) 1)
+             (> (ds/column-count ds2) 1))
+    (let [x (centered-matrix ds1)
+          y (centered-matrix ds2)
+          x' (tens/transpose x [1 0])
+          y' (tens/transpose y [1 0])
+          x'x (tens/matrix-multiply x' x)
+          x'y (tens/matrix-multiply x' y)
+          y'y (tens/matrix-multiply y' y)
+          y'x (tens/matrix-multiply y' x)]
+      (/ (trace (tens/matrix-multiply x'y y'x))
+         (Math/sqrt
+           (* (trace (tens/matrix-multiply x'x x'x))
+              (trace (tens/matrix-multiply y'y y'y))))))))
+
+
+;(rv-coefficient
+  ;(dtensor/row-major-tensor->dataset
+    ;(tens/->tensor [[1.5 2.8 3] [3 4 4] [1 3.2 9.2]]))
+  ;(dtensor/row-major-tensor->dataset
+    ;(tens/->tensor [[-2.3 4.2] [10.8 3.2] [3 0.1]])))
+;; => 0.217975; same as with r code below
+;;
+;;    library(FactoMineR)
+;;
+;;    data(wine)
+;;    x <- c(1.5, 3, 1)
+;;    y <- c(2.8, 4, 3.2)
+;;    z <- c(3,   4, 9.2)
+;;    d1 <- data.frame(x, y, z)
+;;
+;;    x <- c(-2.3, 10.8, 3)
+;;    y <- c(4.2, 3.2, 0.1)
+;;    z <- c(3.8, -8, 3.4)
+;;    d2 <- data.frame(x, y, z)
+;;
+;;    coeffRV(d1, d2)))
+
+(defn filter-by-topic
+  [comments topic]
+  (ds/filter
+    (fn [{:keys [topics]}]
+      (get topics topic))
+    [:topics]
+    comments))
+
+(defn- comment-colnames-by-topic
+  [comments topic]
+  (map (comp keyword str) (:comment-id (filter-by-topic comments topic))))
+
+(defn topical-rv-analysis
+  ([{:as conv :keys [comments matrix]}]
+   (let [topics (reduce set/union (:topics comments))
+         cat-pairs (set (for [c1 topics
+                              c2 topics
+                              :when (not= c1 c2)]
+                          (sort [c1 c2])))
+         results
+         (->> cat-pairs
+           (map
+             (fn [[cat1 cat2]]
+               ;; when let strips out topics for which dim < 2
+               (when-let [rv-coeff (topical-rv-analysis conv cat1 cat2)]
+                 [{:topic1 cat1 :topic2 cat2 :rv-coefficient rv-coeff}
+                  {:topic1 cat2 :topic2 cat1 :rv-coefficient rv-coeff}])))
+           (apply concat)
+           (vec))
+         non-null-topics (set (map :topic1 results))]
+     (concat results
+             ;; rv-coefficient with self is always 1, but again, only want dim > 1, as above
+             (map (fn [topic]
+                    {:topic1 topic :topic2 topic :rv-coefficient 1})
+                  non-null-topics))))
+  ;; Function for computing for a specific pair of topics
+  ([{:keys [comments matrix]} cat1 cat2]
+   (let [cat1-comments (comment-colnames-by-topic comments cat1)
+         cat2-comments (comment-colnames-by-topic comments cat2)
+         cat1-mat (ds/select-columns matrix cat1-comments)
+         cat2-mat (ds/select-columns matrix cat2-comments)
+         rv-coeff (rv-coefficient cat1-mat cat2-mat)]
+     rv-coeff)))
+
+
