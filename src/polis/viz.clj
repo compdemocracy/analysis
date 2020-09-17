@@ -150,11 +150,10 @@
    :transform [{:as :p-agree
                 :calculate "(datum['n-agree'] + 1) / (datum['n-votes'] + 2)"}]
    :hconcat
-   [
-    {:title "UMAP"
+   [{:title "UMAP"
      :mark {:type :point :tooltip {:content :data}}
      :selection {:brush {:type :interval}}
-     :width 450
+     :width 425
      :height 400
      :encoding {:x {:field :umap1, :type :quantitative, :scale {:zero false}}
                 :y {:field :umap2, :type :quantitative, :scale {:zero false}}
@@ -163,7 +162,7 @@
                 :opacity {:field :n-votes :type :quantitative}}}
     {:title "PCA"
      :mark {:type :point :tooltip {:content :data}}
-     :width 450
+     :width 425
      :height 400
      ;:transform [{:filter {:selection :brush}}]
      :encoding {:x {:field :pc1 :type :quantitative}
