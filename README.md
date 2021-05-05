@@ -16,55 +16,28 @@ Specifically, it contains:
 
 If you'd like to use Docker to run this code, you'll obviously want to have Docker installed on your system, preferably set up so that you don't need to run with `sudo`.
 See the end of this document for instructions on this.
-
-You may also want to have `make` installed to simplify the process of running somewhat.
-If you don't have this installed yet, please try installing with your favorite package manager.
+You'll also want `docker-compose` installed to simplify the process of buiding and running the docker containers.
+There _is_ also a `Makefile` with `make build`, `make run` and `make kill` commands which can be used, but these are somewhat more cantankerous to work with, and we recommend using `docker-compose` instead.
 
 
 ## Usage
 
-### Building docker image
+### Building with `docker-compose`
 
-Before you can run anything from Docker, you have to build the Docker image.
-First, clone the code, cd in, then run
+To get started, you'll need to build and run the docker images, which you can do with `docker-compose`.
 
-```
-make build
-```
-
-### Running docker image
-
-Once you've built the image (see above), you can run with
-
-```
-make run
-```
-
-### Building and running
-
-Of course, when you build, you'll typically want to run immediately thereafter, so you can also do
-
-```
-make build && make run
-```
-
-### Using `docker-compose`
-
-You can also use `docker-compose` instead of make:
-
-Generally, you'll want to run
+In general, you'll want to run the following:
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
-Add the `dev.yml` file mounts your local checkout so that data, notebooks, and build targets can be mirrored
-to your local machine.
-This may not be desireable if you are running on a remote machine, or want to pre-build an image for
-distribution on (e.g.) docker-hub.
-If this sounds like you, you can simply run `docker-compose up`
+The `*.dev.yml` file mounts your local checkout so that data, notebooks, and build targets can be mirrored
+to your local machine, which is generally what you want for actually hacking on the notebooks and getting data
+in and out of the docker environment.
 
-To rebuilt, add the `--build` flag.
+However, if you are running on a remote machine, or want to pre-build an image for distribution on (e.g.) docker-hub, this may not be desirable.
+If this sounds like you, you can simply run `docker-compose up`.
 
 ### Connecting
 
@@ -88,7 +61,7 @@ You should now be able to create notebooks with either the Python or Clojupyter 
 #### Oz/Clojure
 
 If you're using Clojure, you can connect to the REPL using the port printed above.
-Most editors with good support for Clojure will be able to connect to this port automatically using the `.nrepl-port` file.
+Most editors with good support for Clojure will be able to connect to this port automatically using the `.nrepl-port` file (as long as you ran with the `dev.yml` config).
 If not, you should be able to manually establish a connection by specifying hostname and port.
 This will let you evaluate and interact with code directly from your editor.
 If you'd rather, you can install `leiningen` and start a repl with `lein repl :connect localhost:3850`, and interact with Clojure through a traditional REPL process.
@@ -100,16 +73,6 @@ This build process features live code reloading, so that as you save changes to 
 **NOTE:** Due to a compilation bug with `libpython-clj`, you may have to evaluate the `polis.math` namespace before you can run the `user` namespace.
 
 
-### Stopping
-
-Docker containers can be a bit of a pain to stop.
-When you're ready to stop the process, open up another terminal shell and run
-
-```
-make kill
-```
-
-
 ### Local Data & Notebooks
 
 There are a couple of example datasets in `data`, and some example notebooks in `notebooks`.
@@ -117,6 +80,19 @@ If you have data or analysis you'd like to keep out of git, the `local` director
 
 In particular, Oz/Clojure are set up to build from `local/notebooks` to `local/build`, and you can put data in `local/data`.
 
+
+### _Re_building with `docker-compose`
+
+You generally shouldn't need to rebuild if you're using the `*.dev.yml` config (since local changes to data
+and notebooks are mirrored into the container).
+However, there are a few cases in which you might need to rebuild:
+* the python dependencies have updated and you'd like access to those
+* you're using the Clojure API from Jupyter, and need access to updated Clojure code or dependencies (using Clojure from Clojupyter requires AOT JVM compilation)
+* the Dockerfile has changed in some other (nontrivial) way
+
+
+
+</br>
 
 ## Installing Docker
 
