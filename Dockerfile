@@ -1,45 +1,21 @@
-FROM clojure:openjdk-11-tools-deps
+FROM clojure:openjdk-11-tools-deps-bullseye
 
-EXPOSE 3850
-EXPOSE 3860
-EXPOSE 3870
-EXPOSE 3880
+# Updating Ubuntu packages & misc installs
+# ========================
 
+RUN apt-get -qq update &&\
+    apt-get -qq -y install curl wget bzip2
 
-RUN echo "deb http://fr.archive.ubuntu.com/ubuntu bionic main" >> /etc/apt/sources.list &&\
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 &&\
-    apt-get update &&\
-    apt-get install libpython3.6-dev python3-pip -y --allow-unauthenticated
+# Pandoc for fun and profit
+RUN apt-get -y install pandoc
 
 # This should make tech.ml stuff fast for things like pca/svd
 RUN apt-get install -y libblas-dev
 
-# Preinstall these packages, so later requirements.txt install will be faster
-RUN pip3 install seaborn &&\
-    pip3 install matplotlib &&\
-    pip3 install sklearn &&\
-    pip3 install numpy &&\
-    pip3 install numba==0.50.1 &&\
-    pip3 install umap-learn &&\
-    pip3 install trimap &&\
-    pip3 install altair &&\
-    pip3 install jupyter
 
-RUN clojure -Sdeps '{:deps {org.clojure/clojure {:mvn/version "1.10.0"} \
-        techascent/tech.ml.dataset {:mvn/version "4.00" \
-                                    :exclusions [org.slf4j/slf4j-api]} \
-        semantic-csv {:mvn/version "0.2.1-alpha1"} \
-        net.mikera/core.matrix {:mvn/version "0.62.0"} \
-        clj-python/libpython-clj {:mvn/version "1.45"} \
-        org.clojure/tools.deps.alpha {:mvn/version "0.6.496" \
-                                      :exclusions [org.slf4j/slf4j-nop]} \
-        cider/cider-nrepl {:mvn/version "0.21.1"} \
-        metasoarous/oz {:mvn/version "1.6.0-alpha25"} \
-        clojupyter {:mvn/version "0.3.2"}}}' \
-   -e "(clojure.core/println :deps-downloaded)"
+# Installing node for static vega png exports
+# ===============================================
 
-
-# Installing node
 ENV NODE_VERSION=14.5.0
 RUN apt-get install -y curl
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
@@ -51,17 +27,55 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
-
 # Install vega-cli for exporting
 RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev g++
-RUN apt-get install -y zlibc zlib1g-dev zlib1g
+#RUN apt-get install -y zlibc zlib1g-dev zlib1g
 
 RUN npm install -g node-gyp
 RUN npm install -g --unsafe-perm canvas
 RUN npm install -g --unsafe-perm vega vega-lite vega-cli
 
-# Pandoc for fun and profit
-RUN apt-get -y install pandoc
+
+
+# Setting up python environment
+# =============================
+
+RUN curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh &&\
+  bash /tmp/miniconda.sh -bfp /usr/local &&\
+  rm -rf /tmp/miniconda.sh &&\
+  conda install -y python=3 &&\
+  conda update conda
+
+RUN apt-get -qq -y autoremove &&\
+  apt-get autoclean &&\
+  rm -rf /var/lib/apt/lists/* /var/log/dpkg.log &&\
+  conda clean --all --yes
+
+ENV PATH /opt/conda/bin:$PATH
+
+RUN conda create -n pyclj python=3.8
+RUN conda install -n pyclj scikit-learn
+RUN conda install -n pyclj numpy
+RUN conda run -n pyclj python3 -mpip install numba==0.57.0
+RUN conda install -n pyclj -c conda-forge umap-learn
+RUN conda install -n pyclj -c anaconda importlib-metadata
+
+RUN conda install -n pyclj seaborn
+RUN conda install -n pyclj matplotlib
+RUN conda install -n pyclj altair
+RUN conda install -n pyclj jupyter
+
+## To install pip packages into the pyclj environment do
+#RUN conda run -n pyclj python3 -mpip install trimap
+
+SHELL ["conda", "run", "-n", "pyclj", "/bin/bash", "-c"]
+ENV LD_LIBRARY_PATH "/usr/local/envs/pyclj:/usr/local/lib:$LD_LIBRARY_PATH"
+# Would like to be able to do something like this but doesn't actually work:
+# ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$(python3-config --prefix)/lib"
+
+
+# Finalizing setup
+# ========================
 
 # Sketch for improved permissions
 #ARG UID=1000
@@ -76,19 +90,27 @@ RUN apt-get -y install pandoc
 
 # Everything after this will get rerun even if the commands haven't changed, since data could change
 WORKDIR /app
-COPY . .
 
 # Make sure deps are pre-installed
-RUN pip3 install -r requirements.txt
-RUN clojure -e "(clojure.core/println :deps-downloaded)"
+COPY deps.edn .
+RUN clojure -P
+
+COPY src/ src/
 
 # Build a uberjar target for clojupyter kernel
-RUN clojure -Spom
-RUN clojure -A:depstar -m hf.depstar.uberjar clojupyter-standalone.jar -C -m polis.main
-RUN clojure -m clojupyter.cmdline install --ident polis-clojupyter-kernel --jarfile clojupyter-standalone.jar
+#RUN clojure -Spom
+#RUN clojure -A:depstar -m hf.depstar.uberjar clojupyter-standalone.jar -C -m polis.main
+#RUN clojure -m clojupyter.cmdline install --ident polis-clojupyter-kernel --jarfile clojupyter-standalone.jar
 
+EXPOSE 3850
+EXPOSE 3860
+EXPOSE 3870
+EXPOSE 3880
+
+
+COPY . .
 
 # Systems go
-CMD bin/run.sh
-
+#CMD ["conda", "run", "-n", "pyclj", "./bin/run.sh"]
+CMD ["conda", "run", "-n", "pyclj", "clojure", "-M:cider-nrepl"]
 
