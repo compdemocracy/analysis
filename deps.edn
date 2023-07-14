@@ -1,8 +1,12 @@
-{:paths ["src"]
- :deps {org.clojure/clojure {:mvn/version "1.10.0"}
-        ;techascent/tech.ml.dataset {:mvn/version "4.00"}
-        techascent/tech.ml.dataset {:mvn/version "4.02"
+{:paths ["src" "dev"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        ;techascent/tech.ml.dataset {:mvn/version "6.086"}
+        techascent/tech.ml.dataset {:mvn/version "7.000-beta-38"
                                     :exclusions [org.slf4j/slf4j-api]}
+        com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}
+
+        ;scicloj/tablecloth {:mvn/version "4.04"}
+        ;scicloj/tablecloth {:mvn/version "7.000-beta-27"} ;; for when we update to tech.ml.dataset 6.x
         uncomplicate/neanderthal {:mvn/version "0.36.0"}
         uncomplicate/neanderthal-native {:mvn/version "0.33.0"}
         org.bytedeco/mkl-platform-redist {:mvn/version "2020.1-1.5.3"}
@@ -10,15 +14,33 @@
 
         ;; For speeding up matrix operations with smile/tech.ml stack
         ;com.github.haifengl/smile-mkl {:mvn/version "2.5.0"}
-        semantic-csv {:mvn/version "0.2.1-alpha1"}
+        semantic-csv/semantic-csv {:mvn/version "0.2.1-alpha1"}
         ;techascent/tech.datatype {:mvn/version "5.05"}
         net.mikera/core.matrix {:mvn/version "0.62.0"}
-        clj-python/libpython-clj {:mvn/version "1.45"}
+        clj-python/libpython-clj {:mvn/version "2.024"}
         org.clojure/tools.deps.alpha {:mvn/version "0.6.496"
                                       :exclusions [org.slf4j/slf4j-nop]}
-        cider/cider-nrepl {:mvn/version "0.21.1"}
-        metasoarous/oz {:mvn/version "1.6.0-alpha26"}
-        clojupyter {:mvn/version "0.3.2"}}
+        ;metasoarous/oz {:local/root "../oz"}
+        ;metasoarous/oz {:mvn/version "1.6.0-alpha35-SNAPSHOT"}
+        metasoarous/oz {:mvn/version "2.0.0-alpha5"}
+        ;metasoarous/oz {:git/url "https://github.com/metasoarous/oz"
+                        ;:sha "73a46c10df98dc5dd4908487b5bd5a491a521859"}
+        clojupyter/clojupyter {:mvn/version "0.3.6"}
+        babashka/process {:mvn/version "0.0.1"}
+        dk.ative/docjure {:mvn/version "1.14.0"}
+        google-translate/google-translate {:mvn/version "0.1.2"}
+        babashka/babashka.pods {:mvn/version "0.1.0"}
+        com.github.seancorfield/honeysql {:mvn/version "2.0.783"}}
+        ;buddy/buddy-core {:mvn/version "1.10.413"}
+        ;org.graalvm.js/js {:mvn/version "20.0.0"}
+        ;org.graalvm.js/js-scriptengine {:mvn/version "20.0.0"}}
         ;panthera {:mvn/version "0.1-alpha.20"}}
- :aliases {:nREPL {:extra-deps {nrepl/nrepl {:mvn/version "0.6.0"}}}
-           :depstar {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}}}}
+ :aliases
+ {:cider-nrepl {:extra-deps {cider/cider-nrepl {:mvn/version "0.28.5"}
+                             nrepl/nrepl {:mvn/version "1.0.0"}}
+                :main-opts ["-m" "nrepl.cmdline"
+                            "-b" "0.0.0.0"
+                            "-p" "3850"
+                            "--middleware" "[cider.nrepl/cider-middleware]"]}
+  :depstar {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}}}}
+
