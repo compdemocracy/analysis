@@ -15,21 +15,22 @@ Specifically, it contains:
 ## Prereqs
 
 If you'd like to use Docker to run this code, you'll obviously want to have Docker installed on your system, preferably set up so that you don't need to run with `sudo`.
-See the end of this document for instructions on this.
-You'll also want `docker-compose` installed to simplify the process of buiding and running the docker containers.
-There _is_ also a `Makefile` with `make build`, `make run` and `make kill` commands which can be used, but these are somewhat more cantankerous to work with, and we recommend using `docker-compose` instead.
+You'll also want `docker compose` installed to simplify the process of buiding and running the docker containers.
+Please refer to <https://docs.docker.com> for reference with this:
+* <https://docs.docker.com/get-docker/>
+* <https://docs.docker.com/compose/install/>
 
 
 ## Usage
 
-### Building with `docker-compose`
+### Building with `docker compose`
 
-To get started, you'll need to build and run the docker images, which you can do with `docker-compose`.
+To get started, you'll need to build and run the docker images, which you can do with `docker compose`.
 
 In general, you'll want to run the following:
 
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 The `*.dev.yml` file mounts your local checkout so that data, notebooks, and build targets can be mirrored
@@ -37,7 +38,7 @@ to your local machine, which is generally what you want for actually hacking on 
 in and out of the docker environment.
 
 However, if you are running on a remote machine, or want to pre-build an image for distribution on (e.g.) docker-hub, this may not be desirable.
-If this sounds like you, you can simply run `docker-compose up`.
+If this sounds like you, you can simply run `docker compose up`.
 
 ### Connecting
 
@@ -81,7 +82,7 @@ If you have data or analysis you'd like to keep out of git, the `local` director
 In particular, Oz/Clojure are set up to build from `local/notebooks` to `local/build`, and you can put data in `local/data`.
 
 
-### _Re_building with `docker-compose`
+### _Re_building with `docker compose`
 
 You generally shouldn't need to rebuild if you're using the `*.dev.yml` config (since local changes to data
 and notebooks are mirrored into the container).
@@ -90,25 +91,5 @@ However, there are a few cases in which you might need to rebuild:
 * you're using the Clojure API from Jupyter, and need access to updated Clojure code or dependencies (using Clojure from Clojupyter requires AOT JVM compilation)
 * the Dockerfile has changed in some other (nontrivial) way
 
-
-
-</br>
-
-## Installing Docker
-
-For Ubuntu-like Linux,
-
-```
-sudo apt-get install docker.io
-sudo systemctl start docker
-sudo systemctl enable docker
-```
-
-A more complete guide can be found here: https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04
-
-If you don't want to have to run Docker with sudo, see: https://docs.docker.com/engine/install/linux-postinstall
-
-The rest of these instructions assume that this has been performed, and that you don't need sudo access to
-run.
 
 
