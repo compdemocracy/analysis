@@ -19,7 +19,7 @@ umap-learn = "*"
 
 [dev-packages]
 ipykernel = "*"
-nbconvert = "*"
+nbstripout = "*"
 
 [requires]
 python_version = "3.12"
