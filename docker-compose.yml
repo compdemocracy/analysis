@@ -1,16 +1,13 @@
-version: "3"
+version: '3.8'
+
 services:
   analysis:
     container_name: polis-analysis
-    image: polis-analysis-docker
+    image: polis-analysis-docker:local
     build:
       context: .
-    environment:
-      NREPL_PORT: 3850
-      OZ_PORT: 3860
-      JUPYTER_PORT: 3870
-      CHOKIDAR_USEPOLLING: "true"
     ports:
-      - 3850:3850
-      - 3860:3860
-      - 3870:3870
+      - "${JUPYTER_PORT:-8888}:8888"
+    volumes:
+      - ./notebooks:/usr/src/app/notebooks
+      - ./data:/usr/src/app/data

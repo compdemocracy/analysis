@@ -11,5 +11,6 @@ __pycache__
 .calva
 .cpcache
 .nrepl-port
+*.pyc
 
 .git
