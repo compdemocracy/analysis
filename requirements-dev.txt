@@ -1,0 +1,14 @@
+altair
+igraph
+ipykernel
+ipywidgets
+leidenalg
+matplotlib
+nbconvert
+notebook
+numpy
+pandas
+scikit-learn
+seaborn
+trimap
+umap-learn

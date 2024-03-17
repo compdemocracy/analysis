@@ -18,6 +18,8 @@ trimap = "*"
 umap-learn = "*"
 
 [dev-packages]
+ipykernel = "*"
+nbconvert = "*"
 
 [requires]
 python_version = "3.12"
