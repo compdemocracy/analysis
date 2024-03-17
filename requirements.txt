@@ -1,9 +1,12 @@
-seaborn
+altair
+igraph
+ipywidgets
+leidenalg
 matplotlib
-sklearn
+notebook
 numpy
 pandas
-umap-learn
+scikit-learn
+seaborn
 trimap
-altair
-jupyter
+umap-learn
