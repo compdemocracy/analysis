@@ -11,4 +11,5 @@ __pycache__
 .calva
 .cpcache
 .nrepl-port
+.clj-kondo
 *.pyc
