@@ -1,0 +1,14 @@
+# Use Jupyter's base notebook as a parent image
+FROM jupyter/base-notebook
+
+# Copy the requirements file into the container
+# (Only if you need additional packages not already in the base image)
+# COPY requirements.txt /tmp/
+# RUN pip install --no-cache-dir -r /tmp/requirements.txt
+# TODO: Consider using conda here
+
+# Copy the notebooks and data directories into the container
+COPY notebooks/ /home/jovyan/work/notebooks/
+COPY data/ /home/jovyan/work/data/
+
+# No need to expose port 8888 or set CMD, as this is handled by the base image
