@@ -3,3 +3,7 @@ services:
   analysis:
     volumes:
       - ".:/app"
+    environment:
+      - DATABASE_URL
+      - ENCRYPTION_PASSWORD_00001
+      - GOOGLE_API_KEY

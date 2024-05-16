@@ -2,7 +2,7 @@ version: "3"
 services:
   analysis:
     container_name: polis-analysis
-    image: polis-analysis-docker
+    image: docker.io/compdem/polis-analysis
     build:
       context: .
     environment:

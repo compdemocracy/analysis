@@ -1,0 +1,20 @@
+name: polis-analysis
+channels: defaults
+dependencies:
+  - numpy
+  - pandas
+  - scikit-learn
+  #- 
+
+#conda install -n polis-analysis scikit-learn
+#conda install -n polis-analysis numpy
+#conda run -n polis-analysis python3 -mpip install numba==0.57.0
+#conda install -n polis-analysis -c conda-forge umap-learn
+#conda install -n polis-analysis -c anaconda importlib-metadata
+
+#conda install -n polis-analysis seaborn
+#conda install -n polis-analysis matplotlib
+#conda install -n polis-analysis altair
+#conda install -n polis-analysis jupyter
+
+
