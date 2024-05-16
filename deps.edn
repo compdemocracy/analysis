@@ -1,24 +1,21 @@
 {:paths ["src"]
- :deps {org.clojure/clojure {:mvn/version "1.10.0"}
-        ;techascent/tech.ml.dataset {:mvn/version "4.00"}
-        techascent/tech.ml.dataset {:mvn/version "4.02"
+ :deps {org.clojure/clojure {:mvn/version "1.11.2"}
+        techascent/tech.ml.dataset {:mvn/version "7.029"
                                     :exclusions [org.slf4j/slf4j-api]}
-        uncomplicate/neanderthal {:mvn/version "0.36.0"}
-        uncomplicate/neanderthal-native {:mvn/version "0.33.0"}
-        org.bytedeco/mkl-platform-redist {:mvn/version "2020.1-1.5.3"}
-        generateme/fastmath {:mvn/version "2.0.3"}
+        ;; uncomplicate/neanderthal {:mvn/version "0.48.0"}
+        ;; uncomplicate/neanderthal-native {:mvn/version "0.46.0"}
+        ;; org.bytedeco/mkl-platform-redist {:mvn/version "2024.0-1.5.10"}
+        ;; org.bytedeco/mkl-platform-redist {:mvn/version "2020.1-1.5.3"}
+        ;; generateme/fastmath {:mvn/version "2.4.0"}
 
-        ;; For speeding up matrix operations with smile/tech.ml stack
-        ;com.github.haifengl/smile-mkl {:mvn/version "2.5.0"}
-        semantic-csv {:mvn/version "0.2.1-alpha1"}
-        ;techascent/tech.datatype {:mvn/version "5.05"}
-        net.mikera/core.matrix {:mvn/version "0.62.0"}
-        clj-python/libpython-clj {:mvn/version "1.45"}
-        org.clojure/tools.deps.alpha {:mvn/version "0.6.496"
-                                      :exclusions [org.slf4j/slf4j-nop]}
-        cider/cider-nrepl {:mvn/version "0.21.1"}
-        metasoarous/oz {:mvn/version "1.6.0-alpha26"}
-        clojupyter {:mvn/version "0.3.2"}}
-        ;panthera {:mvn/version "0.1-alpha.20"}}
- :aliases {:nREPL {:extra-deps {nrepl/nrepl {:mvn/version "0.6.0"}}}
-           :depstar {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}}}}
+        semantic-csv/semantic-csv {:mvn/version "0.2.1-alpha1"}
+        net.mikera/core.matrix {:mvn/version "0.63.0"}
+        clj-python/libpython-clj {:mvn/version "2.025"}
+        org.clojure/tools.deps {:mvn/version "0.19.1417"
+                                :exclusions [org.slf4j/slf4j-nop]}
+        cider/cider-nrepl {:mvn/version "0.47.0"}
+        metasoarous/oz {:mvn/version "2.0.0-alpha5"}
+        clojupyter/clojupyter {:mvn/version "0.4.319"}}
+;;  :aliases {:nREPL {:extra-deps {nrepl/nrepl {:mvn/version "1.1.1"}}}
+;;            :depstar {:extra-deps {com.github.seancorfield/depstar {:mvn/version "2.1.303"}}}}
+ }
