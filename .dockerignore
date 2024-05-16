@@ -4,11 +4,21 @@ __pycache__
 .clj-kondo
 .cpcache
 .ipynb_checkpoints
+.lsp
 .nrepl-port
 .vscode
 
+*.class
 *.pyc
+*.swm
+*.swn
+*.swo
+*.swp
+*.swx
+*.temp
+*.tmp
 
+classes
 clojupyter-standalone.jar
 data/local
 local
@@ -17,5 +27,6 @@ notebooks/jupyter/.ipynb_checkpoints
 notebooks/jupyter/local
 notebooks/oz/local/
 target
+tmp
 
 .git
