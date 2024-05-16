@@ -10,6 +10,5 @@ local
 __pycache__
 .calva
 .cpcache
-.nrepl-port
 
 .git

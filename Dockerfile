@@ -40,6 +40,8 @@ RUN npm install -g --unsafe-perm vega vega-lite vega-cli
 # Setting up python environment
 # =============================
 
+ENV PATH /opt/conda/bin:$PATH
+
 RUN curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh &&\
   bash /tmp/miniconda.sh -bfp /usr/local &&\
   rm -rf /tmp/miniconda.sh &&\
@@ -51,25 +53,26 @@ RUN apt-get -qq -y autoremove &&\
   rm -rf /var/lib/apt/lists/* /var/log/dpkg.log &&\
   conda clean --all --yes
 
-ENV PATH /opt/conda/bin:$PATH
+#RUN conda create -n polis-analysis python=3.8
+#RUN conda install -n polis-analysis scikit-learn
+#RUN conda install -n polis-analysis numpy
+#RUN conda run -n polis-analysis python3 -mpip install numba==0.57.0
+#RUN conda install -n polis-analysis -c conda-forge umap-learn
+#RUN conda install -n polis-analysis -c anaconda importlib-metadata
 
-RUN conda create -n pyclj python=3.8
-RUN conda install -n pyclj scikit-learn
-RUN conda install -n pyclj numpy
-RUN conda run -n pyclj python3 -mpip install numba==0.57.0
-RUN conda install -n pyclj -c conda-forge umap-learn
-RUN conda install -n pyclj -c anaconda importlib-metadata
+#RUN conda install -n polis-analysis seaborn
+#RUN conda install -n polis-analysis matplotlib
+#RUN conda install -n polis-analysis altair
+#RUN conda install -n polis-analysis jupyter
 
-RUN conda install -n pyclj seaborn
-RUN conda install -n pyclj matplotlib
-RUN conda install -n pyclj altair
-RUN conda install -n pyclj jupyter
+COPY conda-env.yml conda-env.yml
+RUN conda env create -f conda-env.yml
 
-## To install pip packages into the pyclj environment do
-#RUN conda run -n pyclj python3 -mpip install trimap
+## To install pip packages into the polis-analysis environment do
+#RUN conda run -n polis-analysis python3 -mpip install trimap
 
-SHELL ["conda", "run", "-n", "pyclj", "/bin/bash", "-c"]
-ENV LD_LIBRARY_PATH "/usr/local/envs/pyclj:/usr/local/lib:$LD_LIBRARY_PATH"
+SHELL ["conda", "run", "-n", "polis-analysis", "/bin/bash", "-c"]
+ENV LD_LIBRARY_PATH "/usr/local/envs/polis-analysis:/usr/local/lib:$LD_LIBRARY_PATH"
 # Would like to be able to do something like this but doesn't actually work:
 # ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$(python3-config --prefix)/lib"
 
@@ -111,6 +114,5 @@ EXPOSE 3880
 COPY . .
 
 # Systems go
-#CMD ["conda", "run", "-n", "pyclj", "./bin/run.sh"]
-CMD ["conda", "run", "-n", "pyclj", "clojure", "-M:cider-nrepl"]
+CMD ["./bin/run.sh"]
 
