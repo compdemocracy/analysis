@@ -1,8 +1,8 @@
 (ns umap-test
-  (:require [tech.ml.dataset :as ds]
-            [tech.v2.datatype :as dt]
-            [libpython-clj.require :refer [require-python]]
-            [libpython-clj.python :as py :refer [py. py.. py.-]]
+  (:require [tech.v3.dataset :as ds]
+            [tech.v3.datatype :as dt]
+            [libpython-clj2.require :refer [require-python]]
+            [libpython-clj2.python :as py :refer [py. py.. py.-]]
             [oz.core :as oz]))
 
 
@@ -76,13 +76,13 @@ iris
 
 (def matrix
   (py/as-numpy
-    (py/as-tensor
-      (py.
-        (py/call-attr-kw iris-df
-                         :drop
-                         []
-                         {:columns "species"})
-        to_numpy))))
+   (py/as-tensor
+    (py.
+     (py/call-attr-kw iris-df
+                      :drop
+                      []
+                      {:columns "species"})
+     to_numpy))))
 
 (def reducer (umap/UMAP))
 

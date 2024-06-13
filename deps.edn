@@ -1,4 +1,4 @@
-{:paths ["src"]
+{:paths ["src" "dev"]
  :deps {org.clojure/clojure {:mvn/version "1.11.3"}
         techascent/tech.ml.dataset {:mvn/version "7.029"
                                     :exclusions [org.slf4j/slf4j-api]}
@@ -15,7 +15,7 @@
         ;; dtype-next has superceded tech.datatype
         cnuernber/dtype-next {:mvn/version "10.113"}
         net.mikera/core.matrix {:mvn/version "0.63.0"}
-        clj-python/libpython-clj {:mvn/version "2.024"}
+        clj-python/libpython-clj {:mvn/version "2.025"}
         org.clojure/tools.deps {:mvn/version "0.19.1432"
                                 :exclusions [org.slf4j/slf4j-nop]}
 

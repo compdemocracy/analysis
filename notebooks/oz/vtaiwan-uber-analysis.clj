@@ -1,9 +1,10 @@
 (ns vtaiwan-uber-analysis
   (:require [polis.math :as math]
             [polis.viz :as viz]
-            [tech.ml.dataset :as ds]
-            [tech.ml.dataset.column :as dcol]
+            [tech.v3.dataset :as ds]
+            [tech.v3.dataset.column :as dcol]
             [semantic-csv.core :as csv]))
+
 
 (def raw-data
   (math/load-data "data/vtaiwan-uber-conv.ts-2015-08-28.exported-2020-07-02"))
@@ -15,7 +16,7 @@
 
 (def analysis
   (-> data
-      (math/apply-scikit-pca{:dimensions 2})
+      (math/apply-scikit-pca {:dimensions 2})
       (math/apply-umap {})))
 
 [:h1 "vTaiwan Uber Analysis"]
