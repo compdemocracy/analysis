@@ -10,7 +10,7 @@
 
 
 (comment
-  ;; You can also 
+  ;; You can also
   (oz/view! {:data {:values [{:a 1 :b 4} {:a 2 :b 2}]}
              :mark :point
              :encoding {:x {:field :a :type :quantitative}
@@ -23,5 +23,3 @@
                :to "local/build"}]
              :port 3860)
   :end)
-
-

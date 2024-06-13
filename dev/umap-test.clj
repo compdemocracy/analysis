@@ -87,6 +87,3 @@
                             :scale {:zero false}}
                         :y {:field "1"
                             :scale {:zero false}}}}))
-
-
-

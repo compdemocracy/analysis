@@ -42,7 +42,7 @@
 ;(csv/->int "4")
 
 (defn vote-column-names [df]
-  (filter 
+  (filter
     (comp (partial re-matches #"^?\d*$") name)
     (ds/column-names df)))
 
@@ -98,7 +98,7 @@
   [export-dir filename]
   (ds/->dataset (str export-dir "/" filename)
     {:key-fn keyword}))
-  
+
 
 (defn load-summary [filename]
   (-> (->> (csv/slurp-csv filename :mappify false)
@@ -199,7 +199,7 @@
         pca-proj (dpca/pca-transform-dataset matrix pca-results dimensions :float64)
         pca-proj (ds/rename-columns pca-proj {0 :pc1 1 :pc2})]
     (-> conv
-        (assoc :pca 
+        (assoc :pca
                (assoc pca-results
                       :projection pca-proj
                       :explained-variance (explained-variance (:eigenvalues pca-results))))
@@ -237,7 +237,7 @@
                               {0 :pc1
                                1 :pc2})]
     (-> conv
-        (assoc :pca 
+        (assoc :pca
                {:projection pca-proj
                 :eigenvectors eigenvectors
                 :explained-variance (py.- sk-pca explained_variance_ratio_)})
@@ -445,4 +445,3 @@
         window))
     (keys window)
     ds))
-

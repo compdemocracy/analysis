@@ -22,7 +22,7 @@
 
  First we're going to load up the iris dataset from sklearn.
  "]
- 
+
 (def iris (sk-data/load_iris))
 iris
 (py/att-type-map iris)

@@ -38,5 +38,3 @@ You can also embed data visualizations in your code blocks using vega-lite or ve
 
 Need to still make it possible to evaluate clojure or other code (JSX?) in these blocks.
 Currently, only literal hiccup blocks are supported, but work is underway to extend this.
-
-

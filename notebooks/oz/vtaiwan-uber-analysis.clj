@@ -66,5 +66,3 @@
  However, the fact that over 70% percent of the variance is _not_ captured by these first two components suggests that there is still some structure not being revealed here."]
 
 [:vega-lite (viz/umap-pca-comparison analysis)]
- 
-

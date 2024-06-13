@@ -44,7 +44,7 @@ RUN npm install
 WORKDIR /usr/src/app
 
 # Install Clojure dependencies
-COPY deps.edn . 
+COPY deps.edn .
 RUN clojure -P
 
 COPY src/ .

@@ -110,5 +110,3 @@ If you don't want to have to run Docker with sudo, see: https://docs.docker.com/
 
 The rest of these instructions assume that this has been performed, and that you don't need sudo access to
 run.
-
-
