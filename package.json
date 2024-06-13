@@ -1,0 +1,12 @@
+{
+  "name": "polis-analysis",
+  "version": "1.0.0",
+  "description": "JS Dependencies for analyzing Polis conversation data.",
+  "devDependencies": {
+    "canvas": "^2.11.2",
+    "node-gyp": "^10.1.0",
+    "vega": "^5.29.0",
+    "vega-cli": "^5.29.0",
+    "vega-lite": "^5.18.1"
+  }
+}

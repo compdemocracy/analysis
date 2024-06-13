@@ -23,4 +23,3 @@
     ;; dependency on marathon.core.  This allows us to shim the
     ;; class.
     ((resolve 'polis.math/-main))))
-

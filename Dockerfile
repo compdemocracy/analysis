@@ -1,94 +1,71 @@
-FROM clojure:openjdk-11-tools-deps
+## Dockerfile for the Clojure + Jupyter Data Science Environment
+## docker build -t polis-analysis:local .
+## docker run -rm -p 3850:3850 -p 3860:3860 -p 3870:3870 -v $(pwd):/usr/src/app polis-analysis:local
 
+# Start from a Clojure image
+# Based on Debian 12 (bookworm)
+FROM clojure:temurin-22-tools-deps
+
+# Set environment variable for non-interactive installations
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Python, pip, and other utilities
+RUN apt-get update && \
+  apt-get install -y \
+  build-essential git curl wget \
+  pandoc libblas-dev \
+  python3 python3-pip python3-dev python3-venv libpython3-dev \
+  libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+# Create and activate a virtual environment
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install any needed packages specified in requirements.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install node for static vega png exports
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+  apt-get install -y nodejs
+
+# Clean up APT when done to reduce image size
+RUN apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Verify the node/npm installation
+RUN node -v && npm -v
+
+# Install vega-cli (for exporting) and other JS dependencies
+COPY package*.json .
+RUN npm install
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Install Clojure dependencies
+COPY deps.edn .
+RUN clojure -P
+
+COPY src/ .
+
+# Copy the bin directory into the container at /usr/src/app
+COPY bin/ ./bin/
+
+# Copy any top-level .py files into the container at /usr/src/app
+COPY *.py .
+
+# Copy the notebooks and data directories into the container at /usr/src/app
+COPY notebooks/ ./notebooks
+COPY data/ ./data
+
+# Expose the necessary ports
+# 3850: Clojure nREPL
+# 3860: Oz Server
+# 3870: Jupyter Notebook
 EXPOSE 3850
 EXPOSE 3860
 EXPOSE 3870
-EXPOSE 3880
 
-
-RUN echo "deb http://fr.archive.ubuntu.com/ubuntu bionic main" >> /etc/apt/sources.list &&\
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 &&\
-    apt-get update &&\
-    apt-get install libpython3.6-dev python3-pip -y --allow-unauthenticated
-
-# This should make tech.ml stuff fast for things like pca/svd
-RUN apt-get install -y libblas-dev
-
-# Preinstall these packages, so later requirements.txt install will be faster
-RUN pip3 install seaborn &&\
-    pip3 install matplotlib &&\
-    pip3 install sklearn &&\
-    pip3 install numpy &&\
-    pip3 install numba==0.50.1 &&\
-    pip3 install umap-learn &&\
-    pip3 install trimap &&\
-    pip3 install altair &&\
-    pip3 install jupyter
-
-RUN clojure -Sdeps '{:deps {org.clojure/clojure {:mvn/version "1.10.0"} \
-        techascent/tech.ml.dataset {:mvn/version "4.00" \
-                                    :exclusions [org.slf4j/slf4j-api]} \
-        semantic-csv {:mvn/version "0.2.1-alpha1"} \
-        net.mikera/core.matrix {:mvn/version "0.62.0"} \
-        clj-python/libpython-clj {:mvn/version "1.45"} \
-        org.clojure/tools.deps.alpha {:mvn/version "0.6.496" \
-                                      :exclusions [org.slf4j/slf4j-nop]} \
-        cider/cider-nrepl {:mvn/version "0.21.1"} \
-        metasoarous/oz {:mvn/version "1.6.0-alpha25"} \
-        clojupyter {:mvn/version "0.3.2"}}}' \
-   -e "(clojure.core/println :deps-downloaded)"
-
-
-# Installing node
-ENV NODE_VERSION=14.5.0
-RUN apt-get install -y curl
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
-ENV NVM_DIR=/root/.nvm
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
-ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-RUN node --version
-RUN npm --version
-
-
-# Install vega-cli for exporting
-RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev g++
-RUN apt-get install -y zlibc zlib1g-dev zlib1g
-
-RUN npm install -g node-gyp
-RUN npm install -g --unsafe-perm canvas
-RUN npm install -g --unsafe-perm vega vega-lite vega-cli
-
-# Pandoc for fun and profit
-RUN apt-get -y install pandoc
-
-# Sketch for improved permissions
-#ARG UID=1000
-#ARG GID=133
-#ARG USERNAME=analyst
-
-#RUN groupadd -g $GID $USERNAME
-#RUN useradd -u $UID -g $GID $USERNAME
-#RUN mkdir /home/$USERNAME && chown $USERNAME:$USERNAME /home/$USERNAME
-#USER $USERNAME
-# Means using a different directory though
-
-# Everything after this will get rerun even if the commands haven't changed, since data could change
-WORKDIR /app
-COPY . .
-
-# Make sure deps are pre-installed
-RUN pip3 install -r requirements.txt
-RUN clojure -e "(clojure.core/println :deps-downloaded)"
-
-# Build a uberjar target for clojupyter kernel
-RUN clojure -Spom
-RUN clojure -A:depstar -m hf.depstar.uberjar clojupyter-standalone.jar -C -m polis.main
-RUN clojure -m clojupyter.cmdline install --ident polis-clojupyter-kernel --jarfile clojupyter-standalone.jar
-
-
-# Systems go
-CMD bin/run.sh
-
-
+# Start the Jupyter Notebook server and Clojure REPL
+CMD ["./bin/run.sh"]

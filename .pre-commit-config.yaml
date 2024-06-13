@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0 # Use the latest version from https://github.com/pre-commit/pre-commit-hooks/releases
+    hooks:
+      - id: end-of-file-fixer
+        exclude: "^data/|^notebooks/build/"
+
+      - id: trailing-whitespace
+        exclude: "^data/|^notebooks/build/"
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.7.1 # Use the latest version from https://github.com/kynan/nbstripout/releases
+    hooks:
+      - id: nbstripout
+        files: ^notebooks/.*\.ipynb$
+        args: ["--strip"]

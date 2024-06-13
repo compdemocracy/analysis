@@ -1,16 +1,24 @@
-version: "3"
+## Use this docker-compose file to build and run the Polis Analysis service
+## docker compose up --build
+
 services:
   analysis:
     container_name: polis-analysis
-    image: polis-analysis-docker
+    image: docker.io/compdem/polis-analysis
     build:
       context: .
     environment:
       NREPL_PORT: 3850
       OZ_PORT: 3860
       JUPYTER_PORT: 3870
-      CHOKIDAR_USEPOLLING: "true"
+      # Optional environment variables
+      DATABASE_URL:
+      ENCRYPTION_PASSWORD_00001:
+      GOOGLE_API_KEY:
     ports:
-      - 3850:3850
-      - 3860:3860
-      - 3870:3870
+      - "${NREPL_PORT:-3850}:3850"
+      - "${OZ_PORT:-3860}:3860"
+      - "${JUPYTER_PORT:-3870}:3870"
+    volumes:
+      - ./notebooks:/usr/src/app/notebooks
+      - ./data:/usr/src/app/data

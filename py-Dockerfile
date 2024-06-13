@@ -1,0 +1,30 @@
+### Python-only Dockerfile for running Jupyter notebooks ###
+
+## docker build -t polis-analysis-py:local -f py-Dockerfile .
+## docker run --rm -p 8888:8888 -v $(pwd):/usr/src/app polis-analysis-py:local
+
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Install build dependencies
+RUN apt-get update \
+  && apt-get install -y build-essential libpython3-dev
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY requirements.txt ./
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the notebooks and data directories into the container at /usr/src/app
+COPY notebooks/ ./notebooks
+COPY data/ ./data
+
+# Make port 8888 available to the world outside this container
+EXPOSE 8888
+
+# Run jupyter notebook when the container launches
+CMD ["jupyter", "notebook", "--ip='*'", "--port=8888", "--no-browser", "--allow-root"]
