@@ -22,9 +22,11 @@ classes
 clojupyter-standalone.jar
 data/local
 local
+node_modules
 notebooks/build/local
 notebooks/jupyter/.ipynb_checkpoints
 notebooks/jupyter/local
 notebooks/oz/local/
+package-lock.json
 target
 tmp
