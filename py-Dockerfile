@@ -1,14 +1,30 @@
-# Use Jupyter's base notebook as a parent image
-FROM jupyter/base-notebook
+### Python-only Dockerfile for running Jupyter notebooks ###
 
-# Copy the requirements file into the container
-# (Only if you need additional packages not already in the base image)
-# COPY requirements.txt /tmp/
-# RUN pip install --no-cache-dir -r /tmp/requirements.txt
-# TODO: Consider using conda here
+## docker build -t polis-analysis-py:local -f py-Dockerfile .
+## docker run --rm -p 8888:8888 -v $(pwd):/usr/src/app polis-analysis-py:local
 
-# Copy the notebooks and data directories into the container
-COPY notebooks/ /home/jovyan/work/notebooks/
-COPY data/ /home/jovyan/work/data/
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
 
-# No need to expose port 8888 or set CMD, as this is handled by the base image
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Install build dependencies
+RUN apt-get update \
+  && apt-get install -y build-essential libpython3-dev
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY requirements.txt ./
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the notebooks and data directories into the container at /usr/src/app
+COPY notebooks/ ./notebooks
+COPY data/ ./data
+
+# Make port 8888 available to the world outside this container
+EXPOSE 8888
+
+# Run jupyter notebook when the container launches
+CMD ["jupyter", "notebook", "--ip='*'", "--port=8888", "--no-browser", "--allow-root"]
