@@ -20,6 +20,7 @@ umap-learn = "*"
 [dev-packages]
 ipykernel = "*"
 nbstripout = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.12"
