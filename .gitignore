@@ -1,5 +1,6 @@
 __pycache__
 
+.DS_Store
 .calva
 .clj-kondo
 .cpcache
@@ -11,6 +12,8 @@ __pycache__
 
 *.class
 *.pyc
+*.pyd
+*.pyo
 *.swm
 *.swn
 *.swo
@@ -30,3 +33,4 @@ notebooks/jupyter/local
 notebooks/oz/local/
 target
 tmp
+venv
