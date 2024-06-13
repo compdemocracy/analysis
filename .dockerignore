@@ -3,6 +3,7 @@ __pycache__
 .calva
 .clj-kondo
 .cpcache
+.env
 .ipynb_checkpoints
 .lsp
 .nrepl-port
@@ -27,7 +28,6 @@ notebooks/build/local
 notebooks/jupyter/.ipynb_checkpoints
 notebooks/jupyter/local
 notebooks/oz/local/
-package-lock.json
 target
 tmp
 

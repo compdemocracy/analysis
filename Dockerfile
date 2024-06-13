@@ -36,8 +36,9 @@ RUN apt-get clean && \
 # Verify the node/npm installation
 RUN node -v && npm -v
 
-# Install vega-cli for exporting
-RUN npm i -g node-gyp canvas vega vega-lite vega-cli
+# Install vega-cli (for exporting) and other JS dependencies
+COPY package*.json .
+RUN npm install
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
